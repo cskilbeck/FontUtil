@@ -1,0 +1,239 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{71F55972-39E3-4B8D-B35C-E4215E7D0F7D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FontUtil</RootNamespace>
+    <AssemblyName>FontUtil</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Presentation" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BinPacking\ArevaloRectanglePacker.cs" />
+    <Compile Include="BinPacking\BinPacker.cs" />
+    <Compile Include="BitmapFont\Layer.cs" />
+    <Compile Include="BitmapFont\TTFont.cs" />
+    <Compile Include="BitmapFont\TTFontCollection.cs" />
+    <Compile Include="BitmapFont\TTFontFamily.cs" />
+    <Compile Include="BitmapFont\TTFontFace.cs" />
+    <Compile Include="Controls\FontDescriptorDialog.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\FontDescriptorDialog.Designer.cs">
+      <DependentUpon>FontDescriptorDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Plugin\BoolParameter.cs" />
+    <Compile Include="Plugin\RenderTypeParameter.cs" />
+    <Compile Include="Plugin\FontDescriptorParameter.cs" />
+    <Compile Include="Util\ChannelMask.cs" />
+    <Compile Include="Util\ColorChannel.cs" />
+    <Compile Include="Controls\RangedPointControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\RangedPointControl.Designer.cs">
+      <DependentUpon>RangedPointControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BitmapFont\GDI.cs" />
+    <Compile Include="BitmapFont\Glyph.cs" />
+    <Compile Include="BitmapFont\GlyphShapeCollection.cs" />
+    <Compile Include="BitmapFont\Graphic.cs" />
+    <Compile Include="BitmapFont\KerningValue.cs" />
+    <Compile Include="BitmapFont\Page.cs" />
+    <Compile Include="Plugin\BitmapParameter.cs" />
+    <Compile Include="Plugin\ChannelMaskParameter.cs" />
+    <Compile Include="Plugin\ColorChannelParameter.cs" />
+    <Compile Include="Plugin\ColorParameter.cs" />
+    <Compile Include="Plugin\FloatParameter.cs" />
+    <Compile Include="Plugin\TTFontParameter.cs" />
+    <Compile Include="Plugin\GraphicParameter.cs" />
+    <Compile Include="Plugin\IntParameter.cs" />
+    <Compile Include="Plugin\PointParameter.cs" />
+    <Compile Include="Plugin\RangedPointParameter.cs" />
+    <Compile Include="Util\NamedBitmap.cs" />
+    <Compile Include="Util\RangedInt.cs" />
+    <Compile Include="UI\InputPin.cs" />
+    <Compile Include="UI\OutputPin.cs" />
+    <Compile Include="UI\Connection.cs" />
+    <Compile Include="Controls\BitmapDialog.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\BitmapDialog.Designer.cs">
+      <DependentUpon>BitmapDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BitmapFont\BitmapFont.cs" />
+    <Compile Include="BinPacking\CygonRectanglePacker.cs" />
+    <Compile Include="UI\DraggableObject.cs" />
+    <Compile Include="UI\FontNode.cs" />
+    <Compile Include="Plugin\FontUtilPluginAttribute.cs" />
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ChannelMaskDialog.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ChannelMaskDialog.Designer.cs">
+      <DependentUpon>ChannelMaskDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MyColorDialog.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\MyColorDialog.Designer.cs">
+      <DependentUpon>MyColorDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MyFontDialog.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\MyFontDialog.Designer.cs">
+      <DependentUpon>MyFontDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Plugin\Function.cs" />
+    <Compile Include="UI\FunctionNode.cs" />
+    <Compile Include="UI\GraphManager.cs" />
+    <Compile Include="UI\InputSocket.cs" />
+    <Compile Include="UI\LayerNode.cs" />
+    <Compile Include="Util\FontDescriptor.cs" />
+    <Compile Include="UI\Node.cs" />
+    <Compile Include="Plugin\Parameter.cs" />
+    <Compile Include="UI\OutputSocket.cs" />
+    <Compile Include="UI\Pin.cs" />
+    <Compile Include="Plugin\Plugin.cs" />
+    <Compile Include="Plugin\PluginManager.cs" />
+    <Compile Include="Controls\PointDialog.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\PointDialog.Designer.cs">
+      <DependentUpon>PointDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\Socket.cs" />
+    <Compile Include="Util\RawBitmap.cs" />
+    <Compile Include="BinPacking\RectanglePacker.cs" />
+    <Compile Include="Util\ThreadManager.cs" />
+    <Compile Include="UI\UIObject.cs" />
+    <Compile Include="Util\Util.cs" />
+    <Compile Include="Util\xml.cs" />
+    <EmbeddedResource Include="Controls\BitmapDialog.resx">
+      <DependentUpon>BitmapDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\FontDescriptorDialog.resx">
+      <DependentUpon>FontDescriptorDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\RangedPointControl.resx">
+      <DependentUpon>RangedPointControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ChannelMaskDialog.resx">
+      <DependentUpon>ChannelMaskDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MyColorDialog.resx">
+      <DependentUpon>MyColorDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MyFontDialog.resx">
+      <DependentUpon>MyFontDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\PointDialog.resx">
+      <DependentUpon>PointDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
