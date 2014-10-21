@@ -1,0 +1,5 @@
+d:\Users\chs\Documents\Visual Studio 2012\Projects\FontUtil\FontUtil\bin\Debug\Plugins\Plugins.dll
+d:\Users\chs\Documents\Visual Studio 2012\Projects\FontUtil\FontUtil\bin\Debug\Plugins\Plugins.pdb
+d:\Users\chs\Documents\Visual Studio 2012\Projects\FontUtil\Blur\obj\Debug\Plugins.csprojResolveAssemblyReference.cache
+d:\Users\chs\Documents\Visual Studio 2012\Projects\FontUtil\Blur\obj\Debug\Plugins.dll
+d:\Users\chs\Documents\Visual Studio 2012\Projects\FontUtil\Blur\obj\Debug\Plugins.pdb
