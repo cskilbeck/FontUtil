@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Bitmapped
+// GDI
+// WPF/Geometry
+// WPF/Normal
+
+using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
@@ -325,6 +330,93 @@ namespace FontUtil
 			}
 		}
 
+        private static Rectangle ScanForContent(Bitmap bitmap, Color bgcol)
+        {
+            int yend = -1;
+            int ystart = -1;
+            int xend = -1;
+            int xstart = -1;
+
+            int w = bitmap.Width;
+            int h = bitmap.Height;
+
+            int bgColARGB = bgcol.ToArgb();
+
+            // find the top left corner of the non-bgcol box
+            for (int len = 0; len < w && xstart == -1; ++len)
+            {
+                int ax = w;
+                int ay = h;
+                int bx = w;
+                int by = h;
+                bool brk = false;
+                for (int s = 0; s <= len && !brk; ++s)
+                {
+                    int xcol = bitmap.GetPixel(len, s).ToArgb();
+                    int ycol = bitmap.GetPixel(s, len).ToArgb();
+                    if (xcol != bgColARGB)
+                    {
+                        ax = len;
+                        ay = s;
+                        brk = true;
+                    }
+                    if (ycol != bgColARGB)
+                    {
+                        bx = s;
+                        by = len;
+                        brk = true;
+                    }
+                }
+                if (ax != w || bx != w)
+                {
+                    xstart = Math.Min(ax, bx);
+                }
+                if (ay != h || by != h)
+                {
+                    ystart = Math.Min(ay, by);
+                }
+                if (xstart != -1 && ystart != -1)
+                {
+                    break;
+                }
+            }
+
+            xend = w - 1;
+            yend = h - 1;
+
+            if(ystart > -1)
+            {
+                // find the width of the non-bgcol box
+                for (int xs = xstart + 1; xs < w; ++xs)
+                {
+                    if (bitmap.GetPixel(xs, ystart).ToArgb() == bgColARGB)
+                    {
+                        xend = xs - 1;
+                        break;
+                    }
+                }
+
+                // find the height of the non-bgcol box
+                for (int ys = ystart + 1; ys < h; ++ys)
+                {
+                    if (bitmap.GetPixel(xstart, ys).ToArgb() == bgColARGB)
+                    {
+                        yend = ys - 1;
+                        break;
+                    }
+                }
+                int bw = xend - xstart + 1;
+                int bh = yend - ystart + 1;
+
+                if (bw > 0 && bh > 0)
+                {
+                    return new Rectangle(xstart, ystart, bw, bh);
+                }
+            }
+
+            return Rectangle.Empty;
+        }
+
 		public bool GDICreateChar(char c, int penWidth, bool rounding)
 		{
 			if (glyph.ContainsKey(c))
@@ -378,85 +470,16 @@ namespace FontUtil
 			}
 
 			Color magenta = Color.FromArgb(0xff, 0xff, 0x00, 0xff);
+            Rectangle bounds = ScanForContent(bitmap, magenta);
 
-			int yend = -1;
-			int ystart = -1;
-			int xend = -1;
-			int xstart = -1;
+            glyph[c] = new Glyph(this, c);
+			glyph[c].advance = advance;
 
-			int w = bitmap.Width;
-			int h = bitmap.Height;
-
-			// find the top left corner of the non-magenta box
-			for (int len = 0; len < w && xstart == -1; ++len)
-			{
-				int ax = w;
-				int ay = h;
-				int bx = w;
-				int by = h;
-				bool brk = false;
-				for (int s = 0; s <= len && !brk; ++s)
-				{
-					if (bitmap.GetPixel(len, s) != magenta)
-					{
-						ax = len;
-						ay = s;
-						brk = true;
-					}
-					if (bitmap.GetPixel(s, len) != magenta)
-					{
-						bx = s;
-						by = len;
-						brk = true;
-					}
-				}
-				if (ax != w || bx != h)
-				{
-					xstart = Math.Min(ax, bx);
-				}
-				if (ay != w || by != h)
-				{
-					ystart = Math.Min(ay, by);
-				}
-				if (xstart != -1 && ystart != -1)
-				{
-					break;
-				}
-			}
-
-			xend = w - 1;
-			yend = h - 1;
-
-			// find the width of the non-magenta box
-			for (int xs = xstart + 1; xs < w; ++xs)
-			{
-				if (bitmap.GetPixel(xs, ystart) == magenta)
-				{
-					xend = xs - 1;
-					break;
-				}
-			}
-
-			// find the height of the non-magenta box
-			for (int ys = ystart + 1; ys < h; ++ys)
-			{
-				if (bitmap.GetPixel(xstart, ys) == magenta)
-				{
-					yend = ys - 1;
-					break;
-				}
-			}
-
-			glyph[c] = new Glyph(this, c);
-			glyph[c].advance = advance;	// need this for bitmapped fonts
-
-			int bw = xend - xstart + 1;
-			int bh = yend - ystart + 1;
-			if (bw > 0 && bh > 0)
-			{
-				glyph[c].originalBitmap = new Bitmap(bw, bh);
-				glyph[c].originalBitmap.CopyRect(bitmap, xstart, ystart, 0, 0, bw, bh);
-				glyph[c].AddImage(this, c, glyph[c].originalBitmap, new Point(xstart + AOffset, ystart));
+            if(!bounds.IsEmpty)
+            {
+				glyph[c].originalBitmap = new Bitmap(bounds.Width, bounds.Height);
+				glyph[c].originalBitmap.CopyRect(bitmap, bounds.Left, bounds.Top, 0, 0, bounds.Width, bounds.Height);
+				glyph[c].AddImage(this, c, glyph[c].originalBitmap, new Point(bounds.Left + AOffset, bounds.Top));
 			}
 
 			return true;
@@ -472,8 +495,6 @@ namespace FontUtil
 			Debug.WriteLine("Creating " + c);
 
 			Glyph g = new Glyph(this, c);
-
-			Bitmap gdiBmp = null;
 
 			GlyphTypeface glyphTypeface = FontFace.glyphTypeFace;
 
@@ -518,41 +539,56 @@ namespace FontUtil
 					renderBmp.Render(dv2);	// this can take a very very long time... thread it, I guess...
 					renderBmp.Freeze();
 
+                    // OK, it's drawn into a shrunk bitmap
+
+                    // work out where to draw it in the real glyph bmp
+                    float left = (float)glyphTypeface.LeftSideBearings[glyphIndex] * height;
+                    float top = (float)glyphTypeface.TopSideBearings[glyphIndex] * height;
+                    float outline_offset = penWidth / 2.0f;
+                    PointF origin = new PointF(left, top);                                  // where the glyph actually is
+                    PointF border = new PointF(outline_offset, outline_offset);             // how much border to add because of fat outlining
+                    PointF pos = origin.Add(border);                                        // where to draw the graphic in the big scannable bitmap
+
 					int bmpHeight = renderBmp.PixelHeight;
 					int bmpWidth = renderBmp.PixelWidth;
 
-					int nStride = (renderBmp.PixelWidth * renderBmp.Format.BitsPerPixel + 7) / 8;
+                    int nStride = (renderBmp.PixelWidth * renderBmp.Format.BitsPerPixel + 7) / 8;
 
-					UInt32[] pixelByteArray = new UInt32[renderBmp.PixelHeight * nStride / 4];
+                    UInt32[] pixelByteArray = new UInt32[renderBmp.PixelHeight * nStride / 4];
 
-					renderBmp.CopyPixels(pixelByteArray, nStride, 0);
+                    // get the small bitmap
+                    renderBmp.CopyPixels(pixelByteArray, nStride, 0);
+                    uint offset = 0;
+                    Bitmap gdiBmp = new Bitmap(bmpWidth, bmpHeight);
+                    using (RawBitmap raw = new RawBitmap(gdiBmp))
+                    {
+                        for (int y = 0; y < bmpHeight; ++y)
+                        {
+                            UInt32 *line = (UInt32 *)raw[0, y];
 
-					uint offset = 0;
+                            for (int x = 0; x < bmpWidth; ++x)
+                            {
+                                line[x] = pixelByteArray[offset + x];
+                            }
+                            offset += (uint)bmpWidth;
+                        }
+                    }
 
-					// stash resulting bitmap into a GDI+ Bitmap
+                    // now create a bitmap big enough to DrawImage renderBmp into at the right offset
+                    Bitmap gbmp = new Bitmap((int)pos.X + 2 + bmpWidth + 2, (int)pos.Y + 2 + bmpHeight);
+                    Graphics gr = Graphics.FromImage(gbmp);
+                    gr.Clear(Color.FromArgb(0));
+                    gr.CompositingQuality = CompositingQuality.HighQuality;
+                    gr.CompositingMode = CompositingMode.SourceCopy;
+                    gr.DrawImage(gdiBmp, origin.Add(border));
 
-					gdiBmp = new Bitmap(bmpWidth, bmpHeight);
-					using (RawBitmap raw = new RawBitmap(gdiBmp))
-					{
-						for (int y = 0; y < bmpHeight; ++y)
-						{
-							UInt32* line = (UInt32*)raw[0, y];
-
-							for (int x = 0; x < bmpWidth; ++x)
-							{
-								line[x] = pixelByteArray[offset + x] >> 8 | 0xff000000;
-							}
-							offset += (uint)bmpWidth;
-						}
-					}
-
-					float left = (float)glyphTypeface.LeftSideBearings[glyphIndex];
-					float top = (float)glyphTypeface.TopSideBearings[glyphIndex];
+                    // ok then, now scan for the edges of the glyph to get the real (pixel based) draw offset
+                    Rectangle bounds = ScanForContent(gbmp, Color.FromArgb(0));
 
 					// calc drawOffset
 					g.penWidth = penWidth;
 					g.originalBitmap = gdiBmp;
-					g.AddImage(this, c, gdiBmp, new PointF(-penWidth / 2.0f + left * height, -penWidth / 2.0f + top * height));
+					g.AddImage(this, c, gdiBmp, new PointF(bounds.Left, bounds.Top));
 				}
 				glyph.Add(c, g);
 

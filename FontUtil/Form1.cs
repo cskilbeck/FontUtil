@@ -9,6 +9,8 @@
 // Fix zooming in tpages which are < 512x512
 // Xbox & WP7 runtimes
 // WP7 pipeline
+// Fix glyph caching
+// Glyph renderer plugin system
 
 using System;
 using System.Diagnostics;
@@ -71,7 +73,6 @@ namespace FontUtil
 			}
 		}
 
-		Font currentGDIFont;
 		BitmapFont bitmapFont;
 		Bitmap texturePageBitmap;
 		Bitmap previewNodeBitmap;
@@ -153,8 +154,6 @@ namespace FontUtil
 			GraphManager.UpdateGraph();
 
 			ScanPlugins();
-
-			currentGDIFont = new Font("Arial Rounded MT Bold", 23);
 
 			zoomLevel = 1;
 
