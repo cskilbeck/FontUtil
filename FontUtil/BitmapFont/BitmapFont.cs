@@ -389,9 +389,21 @@ namespace FontUtil
                 // find the width of the non-bgcol box
                 for (int xs = xstart + 1; xs < w; ++xs)
                 {
-                    if (bitmap.GetPixel(xs, ystart).ToArgb() == bgColARGB)
+                    bool empty = true;
+                    for (int ys = ystart; ys < h; ++ys )
                     {
-                        xend = xs - 1;
+                        if (bitmap.GetPixel(xs, ys).ToArgb() != bgColARGB)
+                        {
+                            empty = false;
+                            break;
+                        }
+                    }
+                    if(!empty)
+                    {
+                        xend = xs;
+                    }
+                    else
+                    {
                         break;
                     }
                 }
@@ -399,14 +411,26 @@ namespace FontUtil
                 // find the height of the non-bgcol box
                 for (int ys = ystart + 1; ys < h; ++ys)
                 {
-                    if (bitmap.GetPixel(xstart, ys).ToArgb() == bgColARGB)
+                    bool empty = true;
+                    for (int xs = xstart; xs < w; ++xs)
                     {
-                        yend = ys - 1;
+                        if (bitmap.GetPixel(xs, ys).ToArgb() != bgColARGB)
+                        {
+                            empty = false;
+                            break;
+                        }
+                    }
+                    if(!empty)
+                    {
+                        yend = ys;
+                    }
+                    else
+                    {
                         break;
                     }
                 }
-                int bw = xend - xstart + 1;
-                int bh = yend - ystart + 1;
+                int bw = xend - xstart;
+                int bh = yend - ystart;
 
                 if (bw > 0 && bh > 0)
                 {
