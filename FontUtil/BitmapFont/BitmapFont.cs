@@ -31,6 +31,7 @@ using WPFPixelFormats = System.Windows.Media.PixelFormats;
 
 using WinRect = System.Windows.Rect;
 using System.Text;
+using System.Drawing.Imaging;
 
 namespace FontUtil
 {
@@ -332,113 +333,39 @@ namespace FontUtil
 
         private static Rectangle ScanForContent(Bitmap bitmap, Color bgcol)
         {
-            int yend = -1;
-            int ystart = -1;
-            int xend = -1;
-            int xstart = -1;
-
             int w = bitmap.Width;
             int h = bitmap.Height;
-
+            int xstart = w + 1;
+            int ystart = h + 1;
+            int xend = -1;
+            int yend = -1;
             int bgColARGB = bgcol.ToArgb();
-
-            // find the top left corner of the non-bgcol box
-            for (int len = 0; len < w && xstart == -1; ++len)
+            for (int y = 0; y < h; ++y)
             {
-                int ax = w;
-                int ay = h;
-                int bx = w;
-                int by = h;
-                bool brk = false;
-                for (int s = 0; s <= len && !brk; ++s)
+                for(int x=0; x<w; ++x)
                 {
-                    int xcol = bitmap.GetPixel(len, s).ToArgb();
-                    int ycol = bitmap.GetPixel(s, len).ToArgb();
-                    if (xcol != bgColARGB)
+                    int p = bitmap.GetPixel(x, y).ToArgb();
+                    if(p != bgColARGB)
                     {
-                        ax = len;
-                        ay = s;
-                        brk = true;
+                        xstart = Math.Min(xstart, x);
+                        ystart = Math.Min(ystart, y);
+                        xend = Math.Max(xend, x);
+                        yend = Math.Max(yend, y);
                     }
-                    if (ycol != bgColARGB)
-                    {
-                        bx = s;
-                        by = len;
-                        brk = true;
-                    }
-                }
-                if (ax != w || bx != w)
-                {
-                    xstart = Math.Min(ax, bx);
-                }
-                if (ay != h || by != h)
-                {
-                    ystart = Math.Min(ay, by);
-                }
-                if (xstart != -1 && ystart != -1)
-                {
-                    break;
                 }
             }
-
-            xend = w - 1;
-            yend = h - 1;
-
-            if(ystart > -1)
+            Rectangle r;
+            if (xend >= 0)
             {
-                // find the width of the non-bgcol box
-                for (int xs = xstart + 1; xs < w; ++xs)
-                {
-                    bool empty = true;
-                    for (int ys = ystart; ys < h; ++ys )
-                    {
-                        if (bitmap.GetPixel(xs, ys).ToArgb() != bgColARGB)
-                        {
-                            empty = false;
-                            break;
-                        }
-                    }
-                    if(!empty)
-                    {
-                        xend = xs;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                // find the height of the non-bgcol box
-                for (int ys = ystart + 1; ys < h; ++ys)
-                {
-                    bool empty = true;
-                    for (int xs = xstart; xs < w; ++xs)
-                    {
-                        if (bitmap.GetPixel(xs, ys).ToArgb() != bgColARGB)
-                        {
-                            empty = false;
-                            break;
-                        }
-                    }
-                    if(!empty)
-                    {
-                        yend = ys;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                int bw = xend - xstart;
-                int bh = yend - ystart;
-
-                if (bw > 0 && bh > 0)
-                {
-                    return new Rectangle(xstart, ystart, bw, bh);
-                }
+                int bw = Math.Max(0, xend - xstart);
+                int bh = Math.Max(0, yend - ystart);
+                r = new Rectangle(xstart, ystart, bw + 1, bh + 1);
             }
-
-            return Rectangle.Empty;
+            else
+            {
+                r = Rectangle.Empty;
+            }
+            return r;
         }
 
 		public bool GDICreateChar(char c, int penWidth, bool rounding)
@@ -609,10 +536,30 @@ namespace FontUtil
                     // ok then, now scan for the edges of the glyph to get the real (pixel based) draw offset
                     Rectangle bounds = ScanForContent(gbmp, Color.FromArgb(0));
 
+                    // now snarf into a new bitmap with the right dimensions
+
+                    Bitmap cropped = new Bitmap(bounds.Width, bounds.Height);
+                    using(Graphics cr = Graphics.FromImage(cropped))
+                    {
+                        cr.SmoothingMode = SmoothingMode.None;
+                        cr.PixelOffsetMode = PixelOffsetMode.None;
+                        cr.CompositingMode = CompositingMode.SourceCopy;
+                        using (ImageAttributes ia = new ImageAttributes())
+                        {
+                            Point[] p = {
+                                             new Point(0, 0),
+                                             new Point(bounds.Width, 0),
+                                             new Point(0, bounds.Height)
+                                         };
+                            ia.SetWrapMode(WrapMode.TileFlipXY);
+                            cr.DrawImage(gbmp, p, bounds, GraphicsUnit.Pixel, ia);
+                        }
+                    }
+
 					// calc drawOffset
 					g.penWidth = penWidth;
-					g.originalBitmap = gdiBmp;
-					g.AddImage(this, c, gdiBmp, new PointF(bounds.Left, bounds.Top));
+                    g.originalBitmap = cropped;
+                    g.AddImage(this, c, cropped, new PointF(bounds.Left, bounds.Top));
 				}
 				glyph.Add(c, g);
 
