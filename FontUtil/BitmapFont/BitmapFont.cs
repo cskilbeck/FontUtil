@@ -1,7 +1,10 @@
-﻿// Bitmapped
+﻿//////////////////////////////////////////////////////////////////////
+// Bitmapped
 // GDI
 // WPF/Geometry
 // WPF/Normal
+
+//////////////////////////////////////////////////////////////////////
 
 using System;
 using System.Diagnostics;
@@ -33,22 +36,30 @@ using WinRect = System.Windows.Rect;
 using System.Text;
 using System.Drawing.Imaging;
 
+//////////////////////////////////////////////////////////////////////
+
 namespace FontUtil
 {
-	public enum RenderType : int
+    //////////////////////////////////////////////////////////////////////
+
+    public enum RenderType : int
 	{
 		GDIFixed = 0,
 		GDITrueType = 1,
 		WPF = 2
 	}
 
-	public enum PackingType
+    //////////////////////////////////////////////////////////////////////
+
+    public enum PackingType
 	{
 		Cygon = 0,
 		Arevalo = 1
 	}
 
-	public class FontLayer
+    //////////////////////////////////////////////////////////////////////
+
+    public class FontLayer
 	{
 		public Color color;
 		public PointF offset;
@@ -62,7 +73,9 @@ namespace FontUtil
 		}
 	}
 
-	public unsafe class BitmapFont
+    //////////////////////////////////////////////////////////////////////
+
+    public unsafe class BitmapFont
 	{
 		public int pageWidth;
 		public int pageHeight;
@@ -73,14 +86,6 @@ namespace FontUtil
 
 		public List<Graphic> globalImageList;
 		public List<FontLayer> layers;
-
-		public string Name
-		{
-			get
-			{
-				return Font.name;
-			}
-		}
 
 		private float baseLine;
 		public int height;
@@ -107,12 +112,26 @@ namespace FontUtil
 
 		public ProgressCallbackDelegate ProgressCallback;
 
-		private void GetBaseline()
+        //////////////////////////////////////////////////////////////////////
+
+        private void GetBaseline()
 		{
 			baseLine = FontFace.Baseline(height);
 		}
 
-		public BitmapFont(TTFontFace fontFace, int height, int pageWidth, int pageHeight, bool antiAlias)
+        //////////////////////////////////////////////////////////////////////
+
+        public string Name
+        {
+            get
+            {
+                return Font.name;
+            }
+        }
+
+        //////////////////////////////////////////////////////////////////////
+
+        public BitmapFont(TTFontFace fontFace, int height, int pageWidth, int pageHeight, bool antiAlias)
 		{
 			this.internalLeading = fontFace.textMetric.tmInternalLeading;
 			this.height = height;
@@ -132,7 +151,9 @@ namespace FontUtil
 			pages = new List<Page>();
 		}
 
-		public void CreateAllLayers(char[] chars, bool singlePixelBorder, ProgressCallbackDelegate progress = null)
+        //////////////////////////////////////////////////////////////////////
+
+        public void CreateAllLayers(char[] chars, bool singlePixelBorder, ProgressCallbackDelegate progress = null)
 		{
 			layers.Clear();
 
@@ -184,7 +205,9 @@ namespace FontUtil
 			Bake(singlePixelBorder);
 		}
 
-		void CreateHFont()
+        //////////////////////////////////////////////////////////////////////
+
+        void CreateHFont()
 		{
 			GDI.LOGFONT logFont = FontFace.logFont;
 
@@ -244,7 +267,9 @@ namespace FontUtil
 			}
 		}
 
-		public void Create(char[] charSet, int outline, bool roundedOutline)
+        //////////////////////////////////////////////////////////////////////
+
+        public void Create(char[] charSet, int outline, bool roundedOutline)
 		{
 			GetBaseline();
 
@@ -275,7 +300,9 @@ namespace FontUtil
 			}
 		}
 
-		public void Bake(bool singlePixelBorder)
+        //////////////////////////////////////////////////////////////////////
+
+        public void Bake(bool singlePixelBorder)
 		{
 			IEnumerable<Graphic> e = from i in globalImageList orderby i ascending select i;
 
@@ -319,7 +346,9 @@ namespace FontUtil
 			}
 		}
 
-		public bool CreateChar(char c, int penWidth, bool rounding)
+        //////////////////////////////////////////////////////////////////////
+
+        public bool CreateChar(char c, int penWidth, bool rounding)
 		{
 			if (FontFace.glyphTypeFace != null)
 			{
@@ -330,6 +359,8 @@ namespace FontUtil
 				return GDICreateChar(c, penWidth, rounding);
 			}
 		}
+
+        //////////////////////////////////////////////////////////////////////
 
         private static Rectangle ScanForContent(Bitmap bitmap, Color bgcol)
         {
@@ -354,21 +385,19 @@ namespace FontUtil
                     }
                 }
             }
-            Rectangle r;
+            Rectangle r = Rectangle.Empty;
             if (xend >= 0)
             {
                 int bw = Math.Max(0, xend - xstart);
                 int bh = Math.Max(0, yend - ystart);
                 r = new Rectangle(xstart, ystart, bw + 1, bh + 1);
             }
-            else
-            {
-                r = Rectangle.Empty;
-            }
             return r;
         }
 
-		public bool GDICreateChar(char c, int penWidth, bool rounding)
+        //////////////////////////////////////////////////////////////////////
+
+        public bool GDICreateChar(char c, int penWidth, bool rounding)
 		{
 			if (glyph.ContainsKey(c))
 			{
@@ -436,7 +465,9 @@ namespace FontUtil
 			return true;
 		}
 
-		public bool WPFCreateChar(char c, int penWidth, bool rounding)
+        //////////////////////////////////////////////////////////////////////
+
+        public bool WPFCreateChar(char c, int penWidth, bool rounding)
 		{
 			if (glyph.ContainsKey(c))
 			{
@@ -529,8 +560,10 @@ namespace FontUtil
                     Bitmap gbmp = new Bitmap((int)pos.X + 2 + bmpWidth + 2, (int)pos.Y + 2 + bmpHeight);
                     Graphics gr = Graphics.FromImage(gbmp);
                     gr.Clear(Color.FromArgb(0));
+                    gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     gr.CompositingQuality = CompositingQuality.HighQuality;
                     gr.CompositingMode = CompositingMode.SourceCopy;
+                    gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
                     gr.DrawImage(gdiBmp, origin.Add(border));
 
                     // ok then, now scan for the edges of the glyph to get the real (pixel based) draw offset
@@ -544,6 +577,7 @@ namespace FontUtil
                         cr.SmoothingMode = SmoothingMode.None;
                         cr.PixelOffsetMode = PixelOffsetMode.None;
                         cr.CompositingMode = CompositingMode.SourceCopy;
+                        cr.InterpolationMode = InterpolationMode.NearestNeighbor;
                         using (ImageAttributes ia = new ImageAttributes())
                         {
                             Point[] p = {
@@ -571,7 +605,9 @@ namespace FontUtil
 			}
 		}
 
-		private void PlotChar(char c, char previous, Bitmap dest, ref PointF pos, int index)
+        //////////////////////////////////////////////////////////////////////
+
+        private void PlotChar(char c, char previous, Bitmap dest, ref PointF pos, int index)
 		{
 			if (glyph.ContainsKey(c))
 			{
@@ -580,7 +616,9 @@ namespace FontUtil
 			}
 		}
 
-		public void PlotString(string s, Bitmap dest, ref PointF pos, int index)
+        //////////////////////////////////////////////////////////////////////
+
+        public void PlotString(string s, Bitmap dest, ref PointF pos, int index)
 		{
 			char p = (char)0;
 			foreach (char c in s)
@@ -590,7 +628,9 @@ namespace FontUtil
 			}
 		}
 
-		public void PlotString(string s, Bitmap dest, ref PointF pos)
+        //////////////////////////////////////////////////////////////////////
+
+        public void PlotString(string s, Bitmap dest, ref PointF pos)
 		{
 			// draw each layer in turn....
 			for (int i = 0; i < numLayers; ++i)
@@ -600,7 +640,9 @@ namespace FontUtil
 			}
 		}
 
-		public float Utilization()
+        //////////////////////////////////////////////////////////////////////
+
+        public float Utilization()
 		{
 			pageSize = 0;
 			foreach (Page p in pages)
@@ -612,11 +654,15 @@ namespace FontUtil
 			return (float)glyphSize / pageSize;
 		}
 
-		public void Load(string filename)
+        //////////////////////////////////////////////////////////////////////
+
+        public void Load(string filename)
 		{
 		}
 
-		public void Save(string filename, bool export)
+        //////////////////////////////////////////////////////////////////////
+
+        public void Save(string filename, bool export)
 		{
 			using (XmlTextWriter output = new XmlTextWriter(filename, System.Text.Encoding.UTF8))
 			{

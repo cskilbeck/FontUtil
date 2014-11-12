@@ -110,6 +110,7 @@ namespace FontUtil
 					{
                         d.PixelOffsetMode = PixelOffsetMode.HighQuality;
 						d.SmoothingMode = SmoothingMode.AntiAlias;
+                        d.InterpolationMode = InterpolationMode.HighQualityBicubic;
 						RectangleF r = new RectangleF((float)i.glyphPosition.Left,
                                                         (float)i.glyphPosition.Top,
                                                         (float)i.glyphPosition.Width,
