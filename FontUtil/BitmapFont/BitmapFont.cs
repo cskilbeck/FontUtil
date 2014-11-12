@@ -575,9 +575,10 @@ namespace FontUtil
                     using(Graphics cr = Graphics.FromImage(cropped))
                     {
                         cr.SmoothingMode = SmoothingMode.None;
-                        cr.PixelOffsetMode = PixelOffsetMode.None;
+                        cr.PixelOffsetMode = PixelOffsetMode.HighQuality;
                         cr.CompositingMode = CompositingMode.SourceCopy;
                         cr.InterpolationMode = InterpolationMode.NearestNeighbor;
+                        cr.CompositingQuality = CompositingQuality.HighQuality;
                         using (ImageAttributes ia = new ImageAttributes())
                         {
                             Point[] p = {
