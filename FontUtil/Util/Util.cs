@@ -164,10 +164,10 @@ namespace FontUtil
 							byte* ptr = rawsrc[0, y];
 							for (int x = 0; x < w; ++x)
 							{
-								int ib = (int)ptr[0] * b / 256;
-								int ig = (int)ptr[1] * g / 256;
-								int ir = (int)ptr[2] * r / 256;
-								int ia = (int)ptr[3] * a / 256;
+								int ib = (int)ptr[0] * b / 255;
+								int ig = (int)ptr[1] * g / 255;
+								int ir = (int)ptr[2] * r / 255;
+								int ia = (int)ptr[3] * a / 255;
 
 								if(ib < 0) ib = 0;
 								if(ig < 0) ig = 0;
