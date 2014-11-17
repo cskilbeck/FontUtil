@@ -257,7 +257,13 @@ namespace FontUtil
 
                     IntPtr oldFont = GDI.SelectObject(hdc, HFont);
                     GDI.GetTextMetrics(hdc, out tm);
+                    GDI.KERNINGPAIR[] kerningTable = GDI.GetKerningTable(hdc);
                     GDI.SelectObject(hdc, oldFont);
+
+                    foreach(GDI.KERNINGPAIR p in kerningTable)
+                    {
+                        Debug.Print(p.wFirst + "," + p.wSecond + " = " + p.iKernAmount);
+                    }
                 }
             }
             int maxWidth = tm.tmMaxCharWidth;
