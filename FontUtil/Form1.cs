@@ -106,6 +106,8 @@ namespace FontUtil
         {
             InitializeComponent();
 
+            TTFParser p = new TTFParser();
+
             Node.SetParentPanel(parametersPanel);
 
             GraphManager.PictureBox = pictureBoxGraph;

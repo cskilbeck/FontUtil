@@ -99,6 +99,7 @@
     <Compile Include="Plugin\BoolParameter.cs" />
     <Compile Include="Plugin\RenderTypeParameter.cs" />
     <Compile Include="Plugin\FontDescriptorParameter.cs" />
+    <Compile Include="TTFParser.cs" />
     <Compile Include="Util\ChannelMask.cs" />
     <Compile Include="Util\ColorChannel.cs" />
     <Compile Include="Controls\RangedPointControl.cs">

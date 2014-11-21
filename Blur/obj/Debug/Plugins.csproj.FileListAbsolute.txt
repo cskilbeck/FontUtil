@@ -3,3 +3,8 @@ d:\Users\chs\Documents\Visual Studio 2012\Projects\FontUtil\FontUtil\bin\Debug\P
 d:\Users\chs\Documents\Visual Studio 2012\Projects\FontUtil\Blur\obj\Debug\Plugins.csprojResolveAssemblyReference.cache
 d:\Users\chs\Documents\Visual Studio 2012\Projects\FontUtil\Blur\obj\Debug\Plugins.dll
 d:\Users\chs\Documents\Visual Studio 2012\Projects\FontUtil\Blur\obj\Debug\Plugins.pdb
+d:\Users\charlie\Projects\FontUtil\FontUtil\bin\Debug\Plugins\Plugins.dll
+d:\Users\charlie\Projects\FontUtil\FontUtil\bin\Debug\Plugins\Plugins.pdb
+d:\Users\charlie\Projects\FontUtil\Blur\obj\Debug\Plugins.csprojResolveAssemblyReference.cache
+d:\Users\charlie\Projects\FontUtil\Blur\obj\Debug\Plugins.dll
+d:\Users\charlie\Projects\FontUtil\Blur\obj\Debug\Plugins.pdb
