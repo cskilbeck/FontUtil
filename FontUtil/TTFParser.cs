@@ -48,41 +48,6 @@ namespace FontUtil
 
         //////////////////////////////////////////////////////////////////////
 
-        public struct Reader
-        {
-            //////////////////////////////////////////////////////////////////////
-
-            public static unsafe T Read<T>(BinaryReader reader, bool swapEndian = true)
-            {
-                Type type = typeof(T);
-                int size = Marshal.SizeOf(type);
-                byte[] buffer = new byte[size];
-                reader.Read(buffer, 0, size);
-                if(swapEndian)
-                {
-                    FieldInfo[] fields = type.GetFields();
-                    foreach (FieldInfo field in fields)
-                    {
-                        int offset = (int)Marshal.OffsetOf(type, field.Name);
-                        int fieldSize = Marshal.SizeOf(field.FieldType);
-                        int top = fieldSize + offset - 1;
-                        for (int i = 0; i < fieldSize / 2; ++i)
-                        {
-                            byte temp = buffer[i + offset];
-                            buffer[i + offset] = buffer[top - i];
-                            buffer[top - i] = temp;
-                        }
-                    }
-                }
-                GCHandle h = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-                T obj = (T)Marshal.PtrToStructure(h.AddrOfPinnedObject(), type);
-                h.Free();
-                return obj;
-            }
-        }
-
-        //////////////////////////////////////////////////////////////////////
-
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct OffsetTable
         {
@@ -206,7 +171,6 @@ namespace FontUtil
                 TableDirectory t = Reader.Read<TableDirectory>(r);
                 Debug.WriteLine("{0:X8}, Length={1:X8}, Offset={2:X8}", StringFromTag(t.szTag), t.uLength, t.uOffset);
                 long pos = r.BaseStream.Position;
-                // process the chunk...
                 r.BaseStream.Seek(t.uOffset, SeekOrigin.Begin);
                 byte[] data = r.ReadBytes((int)t.uLength);
                 ChunkHandler.Handle(t.szTag, data);
