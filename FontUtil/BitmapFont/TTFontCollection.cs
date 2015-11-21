@@ -68,8 +68,8 @@ namespace FontUtil
 
 					string currentUICultureName = CultureInfo.CurrentUICulture.IetfLanguageTag;
 
-                    XmlLanguage userLanguage = XmlLanguage.GetLanguage("en-US");
-                    //XmlLanguage userLanguage = XmlLanguage.GetLanguage(currentUICultureName);
+                    //XmlLanguage userLanguage = XmlLanguage.GetLanguage("en-US");
+                    XmlLanguage userLanguage = XmlLanguage.GetLanguage(currentUICultureName);
 
 					foreach (string s in fontsKey.GetValueNames())
 					{
@@ -89,47 +89,56 @@ namespace FontUtil
 							foreach (System.Windows.Media.FontFamily family in families)
 							{
 								TTFontFamily fnt = null;
-								foreach (TTFontFamily srch in allFonts)
-								{
-									if (srch.name == family.FamilyNames[userLanguage])
-									{
-										fnt = srch;
-										break;
-									}
-								}
+                                foreach (TTFontFamily srch in allFonts)
+                                {
+                                    if (family.FamilyNames.Keys.Contains(userLanguage))
+                                    {
+                                        if (srch.name == family.FamilyNames[userLanguage])
+                                        {
+                                            fnt = srch;
+                                            break;
+                                        }
+                                    }
+                                }
 								if (fnt == null)
 								{
 									fnt = new TTFontFamily();
-									fnt.name = family.FamilyNames[userLanguage];
-									fnt.faces = new List<TTFontFace>();
-									fnt.font = TTFontFamily.CreateFont(fnt.name);
-									allFonts.Add(fnt);
+                                    if (family.FamilyNames.Keys.Contains(userLanguage))
+                                    {
+                                        fnt.name = family.FamilyNames[userLanguage];
+                                        fnt.faces = new List<TTFontFace>();
+                                        fnt.font = TTFontFamily.CreateFont(fnt.name);
+                                        allFonts.Add(fnt);
+                                    }
 								}
 
-								var typefaces = family.GetTypefaces();
-								foreach (Typeface typeface in typefaces)
-								{
-									GlyphTypeface glph;
-									typeface.TryGetGlyphTypeface(out glph);
+                                if (fnt != null && fnt.faces != null)
+                                {
+                                    var typefaces = family.GetTypefaces();
+                                    foreach (Typeface typeface in typefaces)
+                                    {
+                                        GlyphTypeface glph;
+                                        typeface.TryGetGlyphTypeface(out glph);
 
-									bool found = false;
-									foreach (TTFontFace fac in fnt.faces)
-									{
-										if (fac.name == typeface.FaceNames[userLanguage])
-										{
-											found = true;
-											break;
-										}
-									}
-									if (!found)
-									{
-										fnt.faces.Add(new TTFontFace(typeface.FaceNames[userLanguage], fnt, glph));
-									}
-									else
-									{
-										// ditch duplicates I guess...
-									}
-								}
+                                        bool found = false;
+                                        foreach (TTFontFace fac in fnt.faces)
+                                        {
+                                            if (fac.name == typeface.FaceNames[userLanguage])
+                                            {
+                                                found = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!found)
+                                        {
+                                            fnt.faces.Add(new TTFontFace(typeface.FaceNames[userLanguage], fnt, glph));
+                                        }
+                                        else
+                                        {
+                                            // ditch duplicates I guess...
+                                        }
+                                    }
+                                }
 							}
 						}
 						catch (System.NotSupportedException)

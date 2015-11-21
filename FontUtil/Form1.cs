@@ -83,6 +83,8 @@ namespace FontUtil
         int currentTPage;
         int fontPageWidth;
         int fontPageHeight;
+        bool changed;
+        BitmapFont currentFont;
 
         Color glyphPreviewColor = Color.FromKnownColor(KnownColor.ControlDark);
 
@@ -122,7 +124,7 @@ namespace FontUtil
 
             pictureBoxTexturePage.Select();
 
-            for (int i = 7; i <= 11; ++i)	// 128 to 2048 tpage dimensions
+            for (int i = 7; i <= 12; ++i)	// 128 to 4096 tpage dimensions
             {
                 powersWidth.Add(new PowerOf2(i));
                 powersHeight.Add(new PowerOf2(i));
@@ -450,6 +452,7 @@ namespace FontUtil
                 }
             }
             pictureBoxNodePreview.Refresh();
+            currentFont = null;
         }
 
         void PreviewNode(Node node, Graphics gr)
@@ -499,42 +502,45 @@ namespace FontUtil
         {
         }
 
-        BitmapFont CreateBitmapFont(bool export)
+        BitmapFont CreateBitmapFont(bool export, bool force = false)
         {
-            BitmapFont saveFont = new BitmapFont(FontNode.theFont.face, FontNode.theFont.size, fontPageWidth, fontPageHeight, false);
-
-            char[] c = new char[textBoxCharacters.Text.Length];
-
-            int i = 0;
-            foreach (char ch in textBoxCharacters.Text)
+            if (currentFont == null || force)
             {
-                if (ch != 0)
+                currentFont = new BitmapFont(FontNode.theFont.face, FontNode.theFont.size, fontPageWidth, fontPageHeight, false);
+
+                char[] c = new char[textBoxCharacters.Text.Length];
+
+                int i = 0;
+                foreach (char ch in textBoxCharacters.Text)
                 {
-                    c[i++] = ch;
+                    if (ch != 0)
+                    {
+                        c[i++] = ch;
+                    }
                 }
+
+                FontNode.createChar = (char)0;
+
+                // do this in an async! Use a copy of the graph...
+                if (export)
+                {
+                    currentFont.CreateAllLayers(c, checkBoxSinglePixelBorder.Checked);
+                }
+
+                currentFont.useKerning = checkBoxKerning.Checked;
+                currentFont.numLayers = LayerNode.allLayers.Count;
+
+                bitmapFont = currentFont;
+
+                pageUpDown.Minimum = 1;
+                pageUpDown.Maximum = currentFont.pages.Count;
+                zoomLevel = 1;
+                ShowPage(0);
+                pictureBoxTexturePage.Select();
+                labelABC.Text = "Usage: " + currentFont.Utilization() * 100 + "%";
+                changed = false;
             }
-
-            FontNode.createChar = (char)0;
-
-            // do this in an async! Use a copy of the graph...
-            if (export)
-            {
-                saveFont.CreateAllLayers(c, checkBoxSinglePixelBorder.Checked);
-            }
-
-            saveFont.useKerning = checkBoxKerning.Checked;
-            saveFont.numLayers = LayerNode.allLayers.Count;
-
-            bitmapFont = saveFont;
-
-            pageUpDown.Minimum = 1;
-            pageUpDown.Maximum = saveFont.pages.Count;
-            zoomLevel = 1;
-            ShowPage(0);
-            pictureBoxTexturePage.Select();
-            labelABC.Text = "Usage: " + saveFont.Utilization() * 100 + "%";
-
-            return saveFont;
+            return currentFont;
         }
 
         void SaveAs(bool export)
@@ -550,7 +556,7 @@ namespace FontUtil
             // many more checks need to be done here...
             else
             {
-                BitmapFont saveFont = CreateBitmapFont(export);
+                BitmapFont saveFont = CreateBitmapFont(export, force: false);
 
                 SaveFileDialog s = new SaveFileDialog();
                 s.CheckPathExists = true;
@@ -646,12 +652,14 @@ namespace FontUtil
                 s += c;
             }
             textBoxCharacters.Text = s;
+            currentFont = null;
         }
 
         private void buttonClearCharacters_Click(object sender, EventArgs e)
         {
             textBoxCharacters.Text = "";
             chars.Clear();
+            currentFont = null;
         }
 
         private void buttonCharsFromTextFile_Click(object sender, EventArgs e)
@@ -697,7 +705,7 @@ namespace FontUtil
 
         private void buttonCreateFont_Click(object sender, EventArgs e)
         {
-            CreateBitmapFont(true);
+            CreateBitmapFont(export:true, force:true);
         }
     }
 }

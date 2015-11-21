@@ -159,23 +159,23 @@ namespace FontUtil
 
         public TTFParser()
         {
-            ChunkHandler.Register(TagFromString("ABCD"), new NameTableHandler());
-            ChunkHandler.Register(TagFromString("DEFG"), new NameTableHandler());
-            ChunkHandler.Register(TagFromString("HIJK"), new NameTableHandler());
+            //ChunkHandler.Register(TagFromString("ABCD"), new NameTableHandler());
+            //ChunkHandler.Register(TagFromString("DEFG"), new NameTableHandler());
+            //ChunkHandler.Register(TagFromString("HIJK"), new NameTableHandler());
 
-            FileStream f = new FileStream("d:\\test.ttf", FileMode.Open);
-            BinaryReader r = new BinaryReader(f);
-            OffsetTable n = Reader.Read<OffsetTable>(r);
-            for (int i = 0; i < n.uNumOfTables; ++i)
-            {
-                TableDirectory t = Reader.Read<TableDirectory>(r);
-                Debug.WriteLine("{0:X8}, Length={1:X8}, Offset={2:X8}", StringFromTag(t.szTag), t.uLength, t.uOffset);
-                long pos = r.BaseStream.Position;
-                r.BaseStream.Seek(t.uOffset, SeekOrigin.Begin);
-                byte[] data = r.ReadBytes((int)t.uLength);
-                ChunkHandler.Handle(t.szTag, data);
-                r.BaseStream.Seek(pos, SeekOrigin.Begin);
-            }
+            //FileStream f = new FileStream("d:\\test.ttf", FileMode.Open);
+            //BinaryReader r = new BinaryReader(f);
+            //OffsetTable n = Reader.Read<OffsetTable>(r);
+            //for (int i = 0; i < n.uNumOfTables; ++i)
+            //{
+            //    TableDirectory t = Reader.Read<TableDirectory>(r);
+            //    Debug.WriteLine("{0:X8}, Length={1:X8}, Offset={2:X8}", StringFromTag(t.szTag), t.uLength, t.uOffset);
+            //    long pos = r.BaseStream.Position;
+            //    r.BaseStream.Seek(t.uOffset, SeekOrigin.Begin);
+            //    byte[] data = r.ReadBytes((int)t.uLength);
+            //    ChunkHandler.Handle(t.szTag, data);
+            //    r.BaseStream.Seek(pos, SeekOrigin.Begin);
+            //}
         }
     }
 }
