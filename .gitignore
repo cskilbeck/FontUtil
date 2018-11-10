@@ -233,3 +233,4 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 Blur/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+.vs/
